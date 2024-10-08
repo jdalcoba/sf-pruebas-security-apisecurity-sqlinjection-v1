@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<RegularExpressionProtection continueOnError="false" enabled="true" name="RegexTP-PreventSQLInjection">
+  <DisplayName>RegexTP-PreventSQLInjection</DisplayName>
+  <Source>request</Source>
+  <IgnoreUnresolvedVariables>false</IgnoreUnresolvedVariables>
+  <JSONPayload>
+    <JSONPath>
+      <Expression>$</Expression>
+      <Pattern>(?i)\b(union\s+select|select\s+\*|insert\s+into|delete\s+from|update\s+set|drop\s+table|exec|xp_)\b</Pattern>
+      <Pattern>(?i)\b(or|and|exec|create|alter|drop|truncate|declare|execute)\b</Pattern>
+      <Pattern>(?i)\b(--|;|\/\*|\*\/|@@|char\(|nchar\(|varchar\(|nvarchar\(|alter|begin|cast\(|create|cursor|declare|delete|drop|end|exec|fetch|insert|kill|select|sys|sysobjects|syscolumns|table|update)\b</Pattern>
+    </JSONPath>
+  </JSONPayload>
+  <FaultResponse>
+    <Set>
+      <Headers/>
+      <StatusCode>400</StatusCode>
+      <!-- Cambiar a 400 Bad Request -->
+      <ReasonPhrase>Bad Request</ReasonPhrase>
+    </Set>
+  </FaultResponse>
+</RegularExpressionProtection>
