@@ -66,8 +66,8 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCLOUD_KEY }}
 
-      # Ejecuta Apigeelint para validar el código del API Shared Flow
-      - name: Validar el código del API Shared Flow con Apigeelint
+      # Ejecuta Apigeelint para validar el código del Shared Flow
+      - name: Validar el código del Shared Flow con Apigeelint
         run: |
           npm install -g apigeelint
           apigeelint -s ./Code/sharedflowbundle -f table
@@ -84,7 +84,7 @@ jobs:
         run: |
           echo "Subiendo Shared Flow ${{ secrets.SF_NAME }}..."
           RESPONSE=$(curl -X POST \
-            "https://apigee.googleapis.com/v1/organizations/${{ secrets.APIGEE_ORG }}/apis?action=import&name=${{ secrets.SF_NAME }}" \
+            "https://apigee.googleapis.com/v1/organizations/${{ secrets.APIGEE_ORG }}/sharedflows?action=import&name=${{ secrets.SF_NAME }}" \
             -H "Authorization: Bearer $(gcloud auth print-access-token)" \
             -F "file=@./sharedflowbundle.zip")
           echo "Respuesta de subida: $RESPONSE"
@@ -95,9 +95,9 @@ jobs:
 
            # Desplegar el Shared Flow si la subida fue exitosa
             if [[ "$REVISION" != "null" ]]; then
-                echo "Desplegando Shared Flow ${{ secrets.SF_NAME }} en el entorno ${{ secrets.APIGEE_ENV }} con la revisión $REVISION"
+                echo "Desplegando shared flow ${{ secrets.SF_NAME }} en el entorno ${{ secrets.APIGEE_ENV }} con la revisión $REVISION"
                 DEPLOY_RESPONSE=$(curl -X POST \
-                  "https://apigee.googleapis.com/v1/organizations/${{ secrets.APIGEE_ORG }}/environments/${{ secrets.APIGEE_ENV }}/apis/${{ secrets.SF_NAME }}/revisions/$REVISION/deployments?override=true" \
+                  "https://apigee.googleapis.com/v1/organizations/${{ secrets.APIGEE_ORG }}/environments/${{ secrets.APIGEE_ENV }}/sharedflows/${{ secrets.SF_NAME }}/revisions/$REVISION/deployments?override=true" \
                   -H "Authorization: Bearer $(gcloud auth print-access-token)")
                 echo "Respuesta de despliegue: $DEPLOY_RESPONSE"
             else
