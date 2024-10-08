@@ -101,7 +101,7 @@ jobs:
                   -H "Authorization: Bearer $(gcloud auth print-access-token)")
                 echo "Respuesta de despliegue: $DEPLOY_RESPONSE"
             else
-                echo "Error al subir el shared flow."
+                echo "Error al subir el proxy."
                 exit 1
             fi
             
