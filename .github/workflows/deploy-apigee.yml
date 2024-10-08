@@ -1,6 +1,6 @@
 # Este es un workflow básico de GitHub Actions para despliegue en Apigee
 
-name: CI Apigee Proxy Deployment
+name: CI Apigee Shared Flow Deployment
 
 # Controla cuándo se ejecuta el workflow
 on:
@@ -66,8 +66,8 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCLOUD_KEY }}
 
-      # Ejecuta Apigeelint para validar el código del API Proxy
-      - name: Validar el código del API Proxy con Apigeelint
+      # Ejecuta Apigeelint para validar el código del API Shared Flow
+      - name: Validar el código del API Shared Flow con Apigeelint
         run: |
           npm install -g apigeelint
           apigeelint -s ./Code/sharedflowbundle -f table
@@ -79,23 +79,23 @@ jobs:
           cd Code
           zip -r ../sharedflowbundle.zip ./sharedflowbundle
           
-       # Subir el proxy a Apigee usando la API REST
-      - name: Subir API Proxy a Apigee
+       # Subir el Shared Flow a Apigee usando la API REST
+      - name: Subir API Shared Flow a Apigee
         run: |
-          echo "Subiendo proxy ${{ secrets.SF_NAME }}..."
+          echo "Subiendo Shared Flow ${{ secrets.SF_NAME }}..."
           RESPONSE=$(curl -X POST \
             "https://apigee.googleapis.com/v1/organizations/${{ secrets.APIGEE_ORG }}/apis?action=import&name=${{ secrets.SF_NAME }}" \
             -H "Authorization: Bearer $(gcloud auth print-access-token)" \
             -F "file=@./sharedflowbundle.zip")
           echo "Respuesta de subida: $RESPONSE"
 
-          # Extraer el número de revisión del proxy subido
+          # Extraer el número de revisión del Shared Flow subido
           REVISION=$(echo $RESPONSE | jq -r '.revision')
           echo "Revisión importada: $REVISION"
 
-           # Desplegar el proxy si la subida fue exitosa
+           # Desplegar el Shared Flow si la subida fue exitosa
             if [[ "$REVISION" != "null" ]]; then
-                echo "Desplegando proxy ${{ secrets.SF_NAME }} en el entorno ${{ secrets.APIGEE_ENV }} con la revisión $REVISION"
+                echo "Desplegando Shared Flow ${{ secrets.SF_NAME }} en el entorno ${{ secrets.APIGEE_ENV }} con la revisión $REVISION"
                 DEPLOY_RESPONSE=$(curl -X POST \
                   "https://apigee.googleapis.com/v1/organizations/${{ secrets.APIGEE_ORG }}/environments/${{ secrets.APIGEE_ENV }}/apis/${{ secrets.SF_NAME }}/revisions/$REVISION/deployments?override=true" \
                   -H "Authorization: Bearer $(gcloud auth print-access-token)")
